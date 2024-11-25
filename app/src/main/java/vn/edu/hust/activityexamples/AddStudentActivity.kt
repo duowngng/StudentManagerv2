@@ -4,10 +4,9 @@ import android.app.Activity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+
+import android.util.Log
 
 class AddStudentActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,21 +15,37 @@ class AddStudentActivity : AppCompatActivity() {
 
     val editHoten = findViewById<EditText>(R.id.edit_hoten)
     val editMssv = findViewById<EditText>(R.id.edit_mssv)
+    val position = intent.getIntExtra("position", -1)
 
-    // TODO: Su dung setResult de thiet lap ket qua tra ve
+    Log.d("AddStudentActivity", "Received position: $position")
+    Log.d("AddStudentActivity", "Received: ${intent.getStringExtra("hoten")} - ${intent.getStringExtra("mssv")} - ${position}")
 
-    setResult(Activity.RESULT_CANCELED)
+    // Display student info if editing
+    if (position != -1) {
+      // Directly use the passed data, no need to split
+      val hoten = intent.getStringExtra("hoten")
+      val mssv = intent.getStringExtra("mssv")
+      Log.d("AddStudentActivity", "Editing student: $hoten - $mssv")
+      editHoten.setText(hoten)
+      editMssv.setText(mssv)
+    }
 
     findViewById<Button>(R.id.button_ok).setOnClickListener {
-      intent.putExtra("hoten", editHoten.text.toString())
-      intent.putExtra("mssv", editMssv.text.toString())
-      setResult(Activity.RESULT_OK, intent)
+      val resultIntent = intent
+      resultIntent.putExtra("hoten", editHoten.text.toString())
+      resultIntent.putExtra("mssv", editMssv.text.toString())
+      resultIntent.putExtra("position", position) // Pass position back
+      Log.d("AddStudentActivity", "Returning data: hoten=${editHoten.text}, mssv=${editMssv.text}, position=$position")
+      setResult(Activity.RESULT_OK, resultIntent)
       finish()
     }
 
     findViewById<Button>(R.id.button_cancel).setOnClickListener {
+      Log.d("AddStudentActivity", "Cancellation requested, finishing activity")
       setResult(Activity.RESULT_CANCELED)
       finish()
     }
   }
 }
+
+
